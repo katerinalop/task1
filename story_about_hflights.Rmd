@@ -1,0 +1,100 @@
+---
+title: "historyaboutflights"
+output: html_document
+---
+
+```{r}
+
+#install.packages("ggplot2")
+#install.packages("dplyr")
+#install.packages("nycflights13")
+install.packages("hflights")
+
+
+library(ggplot2)
+library(dplyr)
+library(nycflights13)
+library(hflights)
+
+```
+
+
+Як залежить затримка літаків від місця відправлення (аеропорту)?
+
+
+```{r}
+
+data(package = "hflights")
+
+flights <- tbl_df(hflights)
+
+View(flights)
+
+
+```
+
+Спершу, відсортуємо дані, які нам потрібні для дослідження, а саме Origin та Departure Delay.
+
+```{r}
+df <- flights
+
+df %>% 
+  arrange(DepDelay) %>%
+  View() 
+
+df %>% 
+  arrange(desc(DepDelay)) %>%
+  View()  
+
+df %>%
+    select(Origin, DepDelay) %>%
+    arrange(desc(DepDelay))
+
+df1 <- df %>%
+    select(Origin, DepDelay) %>%
+    arrange(desc(DepDelay))
+
+
+```
+
+Тепер перейдемо до побудови графіку, щоб відслідкувати тенденцію або ж спростувати її.
+
+```{r}
+df1 %>%
+  ggplot(aes(Origin, DepDelay)) +
+  geom_point(alpha = 0.5, size = .9)+
+  theme_classic()
+  
+
+```
+
+
+Отже, в середньому літаки в обох аеропортах відправляються із затримкою до трьох годин. Також, цікаво, що інколи аероплани вилітають навіть до 20 хв швидше.
+
+у George Bush Intercontinental Airport більша амплітуда коливань затримок і завчасних рейсів, ніж у William P. Hobby Airport. Очевидно, що це напряму зв'язано із розмірами та відповідно завантаженням аеропортів.Тому можна підтвердити гіпотезу, що гігантських аеропорти більша ймовірність затримки рейсів.
+
+Тепер перевіримо, чи така сама ситуація відбувається із затримкою прибуття і місцем вильоту. Для цього посуртуємо дані ArrDelay та Dest.
+
+```{r}
+
+df2 <- df %>%
+    select(Origin, ArrDelay) %>%
+    arrange(desc(ArrDelay))
+
+```
+
+Перейдемо до побудови графіка
+
+```{r}
+
+df2 %>%
+  ggplot(aes(Origin, ArrDelay)) +
+  geom_point(alpha = 0.5, size = .9)+
+  theme_classic()
+
+
+```
+
+Аналогічна ситуація. В середньому літаки запізнюються на 0-3 години. Щоправда, спостерігаємо і тенденцію швидшого прибуття, ніж заплановано (до 1 год.).
+Літаки, які вилітають із George Bush Intercontinental Airport, аеропорту міжконентального значення, мають більшу ймовірність тривалого запізнення прибуття. 
+
